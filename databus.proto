@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "grpc_test/databus/databus";
+
+package databus;
+
+service DatabusService {
+    rpc ProcessRequest (SendRequest) returns (SendResponse);
+}
+
+message SendRequest {
+    float lhs = 1;
+    float rhs = 2;
+}
+
+message SendResponse {
+    float result = 1;
+}
