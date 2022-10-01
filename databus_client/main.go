@@ -16,19 +16,23 @@ import (
 func main() {
 	flag.Parse()
 
-	// TODO: cmd arg1 validation
-	addr := flag.Arg(0)
-
-	// cmd arg2 validation
-	lhs, err := strconv.ParseFloat(flag.Arg(1), 32)
-	if err != nil {
-		log.Fatalf("Invalid argument at place 2: %v", err)
+	// Check if number of args is valid
+	if len(flag.Args()) != 3 {
+		log.Fatalf("Invalid number of arguments")
 	}
 
-	// cmd arg3 validation
+	addr := flag.Arg(0)
+
+	// Parse 1st param
+	lhs, err := strconv.ParseFloat(flag.Arg(1), 32)
+	if err != nil {
+		log.Fatalf("Invalid lhs argument: %v", err)
+	}
+
+	// Parse 2nd param
 	rhs, err := strconv.ParseFloat(flag.Arg(2), 32)
 	if err != nil {
-		log.Fatalf("Invalid argument at place 3: %v", err)
+		log.Fatalf("Invalid rhs argument: %v", err)
 	}
 
 	// Establish connection
