@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -14,8 +15,8 @@ import (
 )
 
 var (
-	port   int
-	action string
+	action       string
+	validActions = [...]string{"mul", "div", "add", "sub"}
 )
 
 type server struct {
@@ -29,6 +30,9 @@ func (s *server) ProcessRequest(ctx context.Context, in *pb.SendRequest) (*pb.Se
 	case "mul":
 		r = in.Lhs * in.Rhs
 	case "div":
+		if in.Rhs == 0 {
+			return &pb.SendResponse{Result: r}, errors.New("division by zero")
+		}
 		r = in.Lhs / in.Rhs
 	case "add":
 		r = in.Lhs + in.Rhs
@@ -38,17 +42,30 @@ func (s *server) ProcessRequest(ctx context.Context, in *pb.SendRequest) (*pb.Se
 	return &pb.SendResponse{Result: r}, nil
 }
 
+func validateAction(act string) (string, error) {
+	for _, action := range validActions {
+		if act == action {
+			return act, nil
+		}
+	}
+	return "", errors.New("invalid action")
+}
+
 func main() {
 	flag.Parse()
 
-	// cmd arg1 validation
-	if p, err := strconv.Atoi(flag.Arg(0)); err == nil {
-		port = p
-		log.Printf("i=%d, type: %T\n", port, port)
+	// Parse port from args
+	port, err := strconv.Atoi(flag.Arg(0))
+	if err != nil {
+		log.Fatalf("failed to parse port: %v", err)
 	}
 
-	// TODO: cmd arg2 validation
-	action = flag.Arg(1)
+	// Parse action from args
+	a, err := validateAction(flag.Arg(1))
+	if err != nil {
+		log.Fatalf("failed to parse action: %v", err)
+	}
+	action = a
 
 	// Open TCP connection
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
