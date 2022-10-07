@@ -7,6 +7,7 @@ Test project for getting to know the gRPC in Go
 ```
 git clone https://github.com/Murchik/grpc_test.git grpc_test
 cd grpc_test
+make build
 ```
 
 ## To start the server:
